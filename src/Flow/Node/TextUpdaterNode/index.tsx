@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Handle, Position,NodeProps } from 'reactflow';
 import { Input } from 'antd';
-
+import './index.css'
 const handleStyle = { left: 10 };
 
 function TextUpdaterNode({ data, isConnectable }:NodeProps) {
@@ -12,7 +12,7 @@ function TextUpdaterNode({ data, isConnectable }:NodeProps) {
   return (
     <div className="text-updater-node">
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} />
-      <div>
+      <div className='clearInput'>
         <Input placeholder="input with clear icon" allowClear onChange={onChange} />
       </div>
       <Handle

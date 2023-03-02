@@ -13,7 +13,9 @@ import ReactFlow, {
 
 import CustomNode from './CustomNode';
 import TextUpdaterNode from './Node/TextUpdaterNode';
+import SelectNode from './Node/SelectNode';
 
+import {edges as initialEdges,nodes as initialNodes} from './inintData';
 
 // this is important! You need to import the styles from the lib to make it work
 import 'reactflow/dist/style.css';
@@ -23,55 +25,31 @@ import './Flow.css';
 const nodeTypes = {
   custom: CustomNode,
   textUpdater: TextUpdaterNode,
+  customSelecter:SelectNode
 };
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'Node 1' },
-    position: { x: 250, y: 5 },
-    draggable:false
-  },
-  {
-    id: '2',
-    data: { label: 'Node 2' },
-    position: { x: 100, y: 100 },
-  },
-  {
-    id: '3',
-    data: { label: 'Node 3' },
-    position: { x: 400, y: 100 },
-  },
-  {
-    id: '4',
-    data: { label: 'Node 4' },
-    position: { x: 400, y: 200 },
-    type: 'custom',
-
-  },
-  { id: '5', type: 'textUpdater', position: { x: 100, y: 200 }, data: { value: 123 }, connectable: true }
-];
-
-const initialEdges: Edge[] = [
-  { id: 'e1-2', source: '1', target: '2', animated: true ,label: 'to2', type: 'step'},
-  { id: 'e1-3', source: '1', target: '3', animated: true },
-];
 
 function Flow() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const onConnect = useCallback(
     (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
+  const edgesWithUpdatedTypes = edges.map((edge) => {
+    if (edge.sourceHandle) {
+      const edgeType = nodes.find((node) => node?.type === 'customSelecter')?.data?.selects[edge.sourceHandle] as any;
+      edge.type = edgeType;
+    }
 
+    return edge;
+  });
   return (
     <div className="Flow">
       <ReactFlow
         nodes={nodes}
         onNodesChange={onNodesChange}
-        edges={edges}
+        edges={edgesWithUpdatedTypes}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
